@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"sort"
+	"time"
 
 	"github.com/gobwas/glob"
 	"github.com/shu-go/gli"
@@ -11,6 +12,9 @@ import (
 
 type listCmd struct {
 	_ struct{} `help:"list files"`
+
+	Target    gli.StrList   `default:"Name,Title,ID"`
+	OlderThan time.Duration `cli:"older-than,older" help:"Timestamp (e.g. '24h' for 1-day)"`
 
 	Sort  gli.StrList `default:"Name,-Timestamp,ID" help:"sort fields"`
 	Group gli.StrList `default:"" help:"e.g. Channels,Groups,IMs"`
@@ -51,13 +55,26 @@ func (c listCmd) Run(global globalCmd, args []string) error {
 		patterns = append(patterns, glob.MustCompile(a))
 	}
 
+	useOlderThan := false
+	olderTimestamp := time.Now()
+	if c.OlderThan != time.Duration(0) {
+		useOlderThan = true
+		olderTimestamp = time.Now().Add(-c.OlderThan)
+	}
+
 	var prev *slack.File
 	for _, f := range files {
+		if useOlderThan && !f.Timestamp.Time().Before(olderTimestamp) {
+			continue
+		}
+
 		matched := false
 		for _, p := range patterns {
-			if p.Match(f.Name) {
-				matched = true
-				break
+			for _, tgt := range c.Target {
+				if p.Match(fileProp(f, tgt)) {
+					matched = true
+					break
+				}
 			}
 		}
 		if len(patterns) != 0 && !matched {
