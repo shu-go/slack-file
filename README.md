@@ -6,6 +6,7 @@ manipulate files in Slack
 * List
 * Delete
 * Uniq (delete duplicated files)
+* Upload
 
 # Usage
 
@@ -157,4 +158,20 @@ Usage:
   slack-file uniq --key Name --sort -Timestamp --dry-run
   # DELETE
   slack-file uniq --key Name --sort -Timestamp
+```
+
+## Upload
+
+```
+command upload - upload a file
+
+Options:
+  --title  the title of the file
+  --chan   channel or group name (sub-match, posting to all matching channels and groups, no #) (default: general)
+
+Global Options:
+  --config   (default: ./slack-file.conf)
+
+Usage:
+  slack-file upload --chan mychannel /path/to/myfile.log
 ```
