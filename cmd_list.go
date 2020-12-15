@@ -12,7 +12,7 @@ import (
 type listCmd struct {
 	_ struct{} `help:"list files"`
 
-	Order gli.StrList `default:"Name,-Created,-Timestamp,ID" help:"order of the files"`
+	Sort  gli.StrList `default:"Name,-Created,-Timestamp,ID" help:"sort fields"`
 	Group gli.StrList `default:"" help:"e.g. Channels,Groups,IMs"`
 
 	Format string `default:"{{.ID}}\t{{.Timestamp.Time}}\t{{.Name}}"`
@@ -40,7 +40,7 @@ func (c listCmd) Run(global globalCmd, args []string) error {
 
 	var sortProps []string
 	sortProps = append(sortProps, c.Group...)
-	sortProps = append(sortProps, c.Order...)
+	sortProps = append(sortProps, c.Sort...)
 	sort.Slice(files, func(i, j int) bool {
 		c := filePropsCompare(files[i], files[j], sortProps)
 		return c < 0

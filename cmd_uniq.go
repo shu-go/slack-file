@@ -25,7 +25,7 @@ type uniqCmd struct {
 	_ struct{} `help:"delete duplicated files"`
 
 	Key     gli.StrList `default:"Name,Title" help:"a unique key set of files"`
-	Order   gli.StrList `default:"-Created,-Timestamp" help:"order of the files in --key"`
+	Sort    gli.StrList `default:"-Created,-Timestamp" help:"sort fields of each --key group"`
 	Exclude gli.StrList `default:"IsStarred,IsExternal" help:""`
 
 	DryRun bool `cli:"dry-run" help:"do not delete files actually"`
@@ -49,7 +49,7 @@ func (c uniqCmd) Run(global globalCmd) error {
 
 	var sortProps []string
 	sortProps = append(sortProps, c.Key...)
-	sortProps = append(sortProps, c.Order...)
+	sortProps = append(sortProps, c.Sort...)
 	sort.Slice(files, func(i, j int) bool {
 		c := filePropsCompare(files[i], files[j], sortProps)
 		return c < 0
