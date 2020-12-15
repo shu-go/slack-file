@@ -12,7 +12,7 @@ import (
 type listCmd struct {
 	_ struct{} `help:"list files"`
 
-	Sort  gli.StrList `default:"Name,-Created,-Timestamp,ID" help:"sort fields"`
+	Sort  gli.StrList `default:"Name,-Timestamp,ID" help:"sort fields"`
 	Group gli.StrList `default:"" help:"e.g. Channels,Groups,IMs"`
 
 	Format string `default:"{{.ID}}\t{{.Timestamp.Time}}\t{{.Name}}"`

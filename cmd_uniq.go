@@ -25,7 +25,7 @@ type uniqCmd struct {
 	_ struct{} `help:"delete duplicated files"`
 
 	Key     gli.StrList `default:"Name,Title" help:"a unique key set of files"`
-	Sort    gli.StrList `default:"-Created,-Timestamp" help:"sort fields of each --key group"`
+	Sort    gli.StrList `default:"-Created,-Timestamp,ID" help:"sort fields of each --key group"`
 	Exclude gli.StrList `default:"IsStarred,IsExternal" help:""`
 
 	DryRun bool `cli:"dry-run" help:"do not delete files actually"`
