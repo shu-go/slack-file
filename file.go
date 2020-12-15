@@ -1,11 +1,29 @@
 package main
 
 import (
+	"bytes"
 	"strconv"
 	"strings"
+	"text/template"
 
 	"github.com/slack-go/slack"
 )
+
+func fileToString(format string, f slack.File) (string, error) {
+	templ, err := template.New("file").Parse(format)
+	if err != nil {
+		return "", err
+	}
+
+	buf := bytes.Buffer{}
+
+	err = templ.Execute(&buf, f)
+	if err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+}
 
 func listFiles(client *slack.Client, params slack.ListFilesParameters) ([]slack.File, error) {
 	var files []slack.File

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"sort"
 
+	"github.com/gobwas/glob"
 	"github.com/shu-go/gli"
 	"github.com/slack-go/slack"
 )
@@ -13,6 +14,8 @@ type listCmd struct {
 
 	Order gli.StrList `default:"Name,-Created,-Timestamp,ID" help:"order of the files"`
 	Group gli.StrList `default:"" help:"e.g. Channels,Groups,IMs"`
+
+	Format string `default:"{{.ID}}\t{{.Timestamp.Time}}\t{{.Name}}"`
 }
 
 func init() {
@@ -43,17 +46,40 @@ func (c listCmd) Run(global globalCmd, args []string) error {
 		return c < 0
 	})
 
+	var patterns []glob.Glob
+	for _, a := range args {
+		patterns = append(patterns, glob.MustCompile(a))
+	}
+
 	var prev *slack.File
 	for _, f := range files {
-		if prev == nil || filePropsCompare(*prev, f, c.Group) != 0 {
-			temp := f
-			prev = &temp
+		matched := false
+		for _, p := range patterns {
+			if p.Match(f.Name) {
+				matched = true
+				break
+			}
+		}
+		if len(patterns) != 0 && !matched {
+			continue
+		}
 
+		if prev == nil || filePropsCompare(*prev, f, c.Group) != 0 {
+			if prev != nil {
+				println("")
+			}
 			for _, g := range c.Group {
 				println(fileProp(f, g))
 			}
+
+			temp := f
+			prev = &temp
 		}
-		println(f.Name)
+		s, err := fileToString(c.Format, f)
+		if err != nil {
+			return err
+		}
+		println(s)
 	}
 
 	return nil
