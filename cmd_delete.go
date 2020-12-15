@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/gobwas/glob"
@@ -11,17 +12,52 @@ import (
 )
 
 type deleteCmd struct {
-	_ struct{} `help:"delete files" usage:"# delete my*.txt\nslack-file delete my*.txt\n# delete 2days-older files\nslack-file delete --older 48h *"`
+	_ struct{} `help:"delete files" usage:"# delete by pattern\nslack-file delete my*.txt\n# files older than 1day\nslack-file delete --older 24h *\n# files in a general channel\nslack-file delete --chan general *"`
 
 	Target gli.StrList   `default:"Name,Title,ID"`
 	Older  time.Duration `cli:"older-than,older" help:"Timestamp (e.g. '24h' for 1-day)"`
-	DryRun bool          `cli:"dry-run" help:"do not delete files actually"`
+
+	Chan      string `help:"a channel name"`
+	innerChan string
+
+	DryRun bool `cli:"dry-run" help:"do not delete files actually"`
 
 	Format string `default:"{{.ID}}\t{{.Timestamp.Time}}\t{{.Name}}"`
 }
 
 func init() {
 	gApp.AddExtraCommand(&deleteCmd{}, "delete,del,remove,rm", "")
+}
+
+func (c *deleteCmd) Before(global globalCmd) error {
+	if c.Chan != "" {
+		config, _ := loadConfig(global.Config)
+
+		if config.Slack.AccessToken == "" {
+			return errors.New("auth first")
+		}
+
+		sl := slack.New(config.Slack.AccessToken)
+
+		params := slack.GetConversationsForUserParameters{
+			Types: []string{"public_channel", "private_channel"},
+		}
+		chans, err := listConversationsForUser(sl, params)
+		if err != nil {
+			return err
+		}
+
+		for _, ch := range chans {
+			if strings.ToLower(c.Chan) == strings.ToLower(ch.Name) {
+				c.innerChan = ch.ID
+			}
+		}
+
+		if c.innerChan == "" {
+			return errors.New("no channel " + c.Chan + " found")
+		}
+	}
+	return nil
 }
 
 func (c deleteCmd) Run(global globalCmd, args []string) error {
@@ -75,6 +111,26 @@ func (c deleteCmd) Run(global globalCmd, args []string) error {
 		}
 		if !matched {
 			continue
+		}
+
+		if c.innerChan != "" {
+			found := false
+			for _, fc := range f.Channels {
+				if c.innerChan == fc {
+					found = true
+					break
+				}
+			}
+			for _, fc := range f.Groups {
+				if c.innerChan == fc {
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				continue
+			}
 		}
 
 		s, err := fileToString(c.Format, f)

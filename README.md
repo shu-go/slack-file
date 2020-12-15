@@ -106,6 +106,7 @@ command list - list files
 Options:
   --target                (default: Name,Title,ID)
   --older, --older-than  Timestamp (e.g. '24h' for 1-day)
+  --chan                 a channel name
   --sort                 sort fields (default: Name,-Timestamp,ID)
   --group                e.g. Channels,Groups,IMs
   --format                (default: {{.ID}}     {{.Timestamp.Time}}     {{.Name}})
@@ -114,7 +115,14 @@ Global Options:
   --config   (default: ./slack-file.conf)
 
 Usage:
+  # list all
+  slack-file list
+  # find by pattern
   slack-file list my*.txt
+  # files older than 1day
+  slack-file list --older 24h
+  # files in a general channel
+  slack-file list --chan general
 ```
 
 
@@ -126,6 +134,7 @@ command delete - delete files
 Options:
   --target                (default: Name,Title,ID)
   --older, --older-than  Timestamp (e.g. '24h' for 1-day)
+  --chan                 a channel name
   --dry-run              do not delete files actually
   --format                (default: {{.ID}}     {{.Timestamp.Time}}     {{.Name}})
 
@@ -133,10 +142,12 @@ Global Options:
   --config   (default: ./slack-file.conf)
 
 Usage:
-  # delete my*.txt
+  # delete by pattern
   slack-file delete my*.txt
-  # delete 2days-older files
-  slack-file delete --older 48h *
+  # files older than 1day
+  slack-file delete --older 24h *
+  # files in a general channel
+  slack-file delete --chan general *
 ```
 
 ## Uniq
