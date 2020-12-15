@@ -24,20 +24,20 @@ type globalCmd struct {
 
 func main() {
 	gApp.Name = "slack-file"
-	gApp.Desc = "delete duplicated files from Slack"
+	gApp.Desc = "manipulate files in Slack"
 	gApp.Version = Version
-	gApp.Usage = `------------
-how to start
-------------
+	gApp.Usage = `-------------------
+how to start (uniq)
+-------------------
 
 1. follow 'slack-file help auth'
-2. 'slack-file auth {CLIENT_ID} {CLIENT_SECRET}'
-3. 'slack-file uniq --dry-run'
-4. 'slack-file help uniq'
-5. 'slack-file uniq'
+     'slack-file auth'
+     'slack-file auth {CLIENT_ID} {CLIENT_SECRET}'
+2. 'slack-file uniq --dry-run'
+3. 'slack-file uniq'
 
 ---------------------------
- --key, --order, --exclude
+ --key, --sort, --exclude
 ---------------------------
 
 id

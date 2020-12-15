@@ -11,10 +11,10 @@ import (
 )
 
 type listCmd struct {
-	_ struct{} `help:"list files"`
+	_ struct{} `help:"list files" usage:"slack-file list my*.txt"`
 
-	Target    gli.StrList   `default:"Name,Title,ID"`
-	OlderThan time.Duration `cli:"older-than,older" help:"Timestamp (e.g. '24h' for 1-day)"`
+	Target gli.StrList   `default:"Name,Title,ID"`
+	Older  time.Duration `cli:"older-than,older" help:"Timestamp (e.g. '24h' for 1-day)"`
 
 	Sort  gli.StrList `default:"Name,-Timestamp,ID" help:"sort fields"`
 	Group gli.StrList `default:"" help:"e.g. Channels,Groups,IMs"`
@@ -55,16 +55,16 @@ func (c listCmd) Run(global globalCmd, args []string) error {
 		patterns = append(patterns, glob.MustCompile(a))
 	}
 
-	useOlderThan := false
-	olderTimestamp := time.Now()
-	if c.OlderThan != time.Duration(0) {
-		useOlderThan = true
-		olderTimestamp = time.Now().Add(-c.OlderThan)
+	useOlder := false
+	oldTimestamp := time.Now()
+	if c.Older != time.Duration(0) {
+		useOlder = true
+		oldTimestamp = time.Now().Add(-c.Older)
 	}
 
 	var prev *slack.File
 	for _, f := range files {
-		if useOlderThan && !f.Timestamp.Time().Before(olderTimestamp) {
+		if useOlder && !f.Timestamp.Time().Before(oldTimestamp) {
 			continue
 		}
 

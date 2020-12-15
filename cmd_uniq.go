@@ -22,11 +22,11 @@ func fileString(f slack.File) string {
 }
 
 type uniqCmd struct {
-	_ struct{} `help:"delete duplicated files"`
+	_ struct{} `help:"delete duplicated files" usage:"# SIMULATE delete duplicated files by Name, keep newest Timestamp\nslack-file uniq --key Name --sort -Timestamp --dry-run\n# DELETE\nslack-file uniq --key Name --sort -Timestamp"`
 
 	Key     gli.StrList `default:"Name,Title" help:"a unique key set of files"`
 	Sort    gli.StrList `default:"-Created,-Timestamp,ID" help:"sort fields of each --key group"`
-	Exclude gli.StrList `default:"IsStarred,IsExternal" help:""`
+	Exclude gli.StrList `default:"IsStarred,IsExternal" help:"do not delete if any properties not empty"`
 
 	DryRun bool `cli:"dry-run" help:"do not delete files actually"`
 }
