@@ -29,6 +29,8 @@ type uniqCmd struct {
 	Exclude gli.StrList `default:"IsStarred,IsExternal" help:"do not delete if any properties not empty"`
 
 	DryRun bool `cli:"dry-run" help:"do not delete files actually"`
+
+	Format string `default:"{{.Name}}({{.ID}})\t{{.Timestamp.Time}}"`
 }
 
 func (c uniqCmd) Run(global globalCmd) error {
@@ -57,6 +59,11 @@ func (c uniqCmd) Run(global globalCmd) error {
 
 	var head *slack.File
 	for _, f := range files {
+		filestr, err := fileToString(c.Format, f)
+		if err != nil {
+			return err
+		}
+
 		excluded := false
 		for _, e := range c.Exclude {
 			if testProp(f, e) {
@@ -64,16 +71,16 @@ func (c uniqCmd) Run(global globalCmd) error {
 			}
 		}
 		if excluded {
-			fmt.Printf("[EXCLUDED] %v\n", fileString(f))
+			fmt.Printf("[EXCLUDED] %v\n", filestr)
 			continue
 		}
 
 		if head == nil || filePropsCompare(*head, f, c.Key) != 0 {
-			fmt.Printf("%v\n", fileString(f))
+			fmt.Printf("%v\n", filestr)
 			curr := f
 			head = &curr
 		} else {
-			fmt.Printf("  [DEL] %v\n", fileString(f))
+			fmt.Printf("  [DEL] %v\n", filestr)
 			if !c.DryRun && !excluded {
 				err := sl.DeleteFile(f.ID)
 				if err != nil {
