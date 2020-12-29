@@ -40,11 +40,11 @@ LOOP:
 		if len(list) == 0 {
 			break LOOP
 		}
+		files = append(files, list...)
+
 		if rparams.Cursor == "" {
 			break LOOP
 		}
-
-		files = append(files, list...)
 	}
 
 	return files, nil
