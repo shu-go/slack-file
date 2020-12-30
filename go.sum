@@ -16,6 +16,8 @@ github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/mattn/go-runewidth v0.0.8 h1:3tS41NlGYSmhhe/8fhGRzc+z3AYCw1Fe1WAyLuujKs0=
 github.com/mattn/go-runewidth v0.0.8/go.mod h1:H031xJmbD/WCDINGzjvQ9THkh0rPKHF+m2gUSrubnMI=
+github.com/mattn/go-runewidth v0.0.9 h1:Lm995f3rfxdpd6TSmuVCHVb/QhupuXlYr8sCI/QdE+0=
+github.com/mattn/go-runewidth v0.0.9/go.mod h1:H031xJmbD/WCDINGzjvQ9THkh0rPKHF+m2gUSrubnMI=
 github.com/pkg/browser v0.0.0-20201207095918-0426ae3fba23 h1:dofHuld+js7eKSemxqTVIo8yRlpRw+H1SdpzZxWruBc=
 github.com/pkg/browser v0.0.0-20201207095918-0426ae3fba23/go.mod h1:N6UoU20jOqggOuDwUaBQpluzLNDqif3kq9z2wpdYEfQ=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
@@ -25,6 +27,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/shu-go/cliparser v0.0.0-20200117023617-703f3090516f h1:/6hQXakUpt/eZM/XtPDsQW2PuTXuqLwX7KD0RHM/BkM=
 github.com/shu-go/cliparser v0.0.0-20200117023617-703f3090516f/go.mod h1:h9zBORgtxOkotAowPkA87REX/iR5Kg1OtguILkbX5Vg=
+github.com/shu-go/cliparser v0.0.0-20201111232337-1ae2210033bd h1:k9vwHKpmydV97nbun+6c0gQp8fYseXC4hUsIRRl8UF0=
+github.com/shu-go/cliparser v0.0.0-20201111232337-1ae2210033bd/go.mod h1:h9zBORgtxOkotAowPkA87REX/iR5Kg1OtguILkbX5Vg=
 github.com/shu-go/clise v0.0.0-20190822023516-79849fb81cfe/go.mod h1:VLiMEzXMBozBLD37i3id3qPflaupus48v/979ipQ43s=
 github.com/shu-go/gli v0.0.0-20201111232558-3bd97830629d h1:63zJAq19eDQTK3z5fSHSRnyK+ax+Jkuv1osBxO34vEM=
 github.com/shu-go/gli v0.0.0-20201111232558-3bd97830629d/go.mod h1:bB0YEXDtEnnO3tpKiwGKr6FCeeJxm2uSc5He73IUCqI=
