@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/gobwas/glob"
 	"github.com/shu-go/gli"
 	"github.com/slack-go/slack"
 )
@@ -24,9 +25,11 @@ func fileString(f slack.File) string {
 type uniqCmd struct {
 	_ struct{} `help:"delete duplicated files" usage:"# SIMULATE delete duplicated files by Name, keep newest Timestamp\nslack-file uniq --key Name --sort -Timestamp --dry-run\n# DELETE\nslack-file uniq --key Name --sort -Timestamp"`
 
-	Key     gli.StrList `default:"Name,Title" help:"a unique key set of files"`
-	Sort    gli.StrList `default:"-Created,-Timestamp,ID" help:"sort fields of each --key group"`
-	Exclude gli.StrList `default:"IsStarred,IsExternal" help:"do not delete if any properties not empty"`
+	Key  gli.StrList `default:"Name,Title" help:"a unique key set of files"`
+	Sort gli.StrList `default:"-Created,-Timestamp,ID" help:"sort fields of each --key group"`
+
+	Exclude         gli.StrList `cli:"exclude,x" help:"do not delete if Name or Title are match"`
+	ExcludeProperty gli.StrList `cli:"exclude-property,xp" default:"IsStarred,IsExternal" help:"do not delete if any properties not empty"`
 
 	DryRun bool `cli:"dry-run" help:"do not delete files actually"`
 
@@ -66,8 +69,16 @@ func (c uniqCmd) Run(global globalCmd) error {
 
 		excluded := false
 		for _, e := range c.Exclude {
-			if testProp(f, e) {
+			ptn := glob.MustCompile(e)
+			if ptn.Match(f.Name) || ptn.Match(f.Title) {
 				excluded = true
+			}
+		}
+		if !excluded {
+			for _, e := range c.ExcludeProperty {
+				if testProp(f, e) {
+					excluded = true
+				}
 			}
 		}
 		if excluded {
