@@ -1,24 +1,12 @@
 package main
 
 import (
-	"crypto/ecdsa"
-	"crypto/ed25519"
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-	"crypto/x509/pkix"
 	"encoding/json"
-	"encoding/pem"
-	"flag"
 	"fmt"
 	"io"
-	"log"
-	"math/big"
-	"net"
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/pkg/browser"
@@ -81,10 +69,8 @@ func (c authCmd) Run(global globalCmd, args []string) error {
 		return fmt.Errorf("failed to open the authURI(%s): %v", authURI, err)
 	}
 
-	generateCert("localhost", "./cert.pem", "./key.pem")
-
 	resultChan := make(chan string)
-	go minredir.LaunchMinServerTLS(c.Port, "./cert.pem", "./key.pem", minredir.CodeOAuth2Extractor, resultChan)
+	go minredir.LaunchMinServerTLS(c.Port, minredir.CodeOAuth2Extractor, resultChan)
 
 	authCode := waitForStringChan(resultChan, time.Duration(c.Timeout)*time.Second)
 	if authCode == "" {
@@ -157,105 +143,4 @@ func slackFetchAccessToken(clientID, clientSecret, authCode, redirectURI string)
 
 type slackOAuth2AuthedTokens struct {
 	AccessToken string `json:"access_token"`
-}
-
-func publicKey(priv any) any {
-	switch k := priv.(type) {
-	case *rsa.PrivateKey:
-		return &k.PublicKey
-	case *ecdsa.PrivateKey:
-		return &k.PublicKey
-	case ed25519.PrivateKey:
-		return k.Public().(ed25519.PublicKey)
-	default:
-		return nil
-	}
-}
-
-// go/src/crypto/tls/generate_cert.go
-
-func generateCert(host, cert, key string) {
-	flag.Parse()
-
-	var priv any
-	priv, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		log.Fatalf("Failed to generate private key: %v", err)
-	}
-
-	// ECDSA, ED25519 and RSA subject keys should have the DigitalSignature
-	// KeyUsage bits set in the x509.Certificate template
-	keyUsage := x509.KeyUsageDigitalSignature
-	// Only RSA subject keys should have the KeyEncipherment KeyUsage bits set. In
-	// the context of TLS this KeyUsage is particular to RSA key exchange and
-	// authentication.
-	if _, isRSA := priv.(*rsa.PrivateKey); isRSA {
-		keyUsage |= x509.KeyUsageKeyEncipherment
-	}
-
-	notBefore := time.Now()
-
-	notAfter := notBefore.Add(365 * 24 * time.Hour)
-
-	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
-	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
-	if err != nil {
-		log.Fatalf("Failed to generate serial number: %v", err)
-	}
-
-	template := x509.Certificate{
-		SerialNumber: serialNumber,
-		Subject: pkix.Name{
-			Organization: []string{"Acme Co"},
-		},
-		NotBefore: notBefore,
-		NotAfter:  notAfter,
-
-		KeyUsage:              keyUsage,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
-	}
-
-	hosts := strings.Split(host, ",")
-	for _, h := range hosts {
-		if ip := net.ParseIP(h); ip != nil {
-			template.IPAddresses = append(template.IPAddresses, ip)
-		} else {
-			template.DNSNames = append(template.DNSNames, h)
-		}
-	}
-
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, publicKey(priv), priv)
-	if err != nil {
-		log.Fatalf("Failed to create certificate: %v", err)
-	}
-
-	certOut, err := os.Create(cert)
-	if err != nil {
-		log.Fatalf("Failed to open %s for writing: %v", cert, err)
-	}
-	if err := pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}); err != nil {
-		log.Fatalf("Failed to write data to %s: %v", cert, err)
-	}
-	if err := certOut.Close(); err != nil {
-		log.Fatalf("Error closing %s: %v", cert, err)
-	}
-	log.Printf("wrote %s\n", cert)
-
-	keyOut, err := os.OpenFile(key, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		log.Fatalf("Failed to open %s for writing: %v", key, err)
-		return
-	}
-	privBytes, err := x509.MarshalPKCS8PrivateKey(priv)
-	if err != nil {
-		log.Fatalf("Unable to marshal private key: %v", err)
-	}
-	if err := pem.Encode(keyOut, &pem.Block{Type: "PRIVATE KEY", Bytes: privBytes}); err != nil {
-		log.Fatalf("Failed to write data to %s: %v", key, err)
-	}
-	if err := keyOut.Close(); err != nil {
-		log.Fatalf("Error closing %s: %v", key, err)
-	}
-	log.Printf("wrote %s\n", key)
 }
