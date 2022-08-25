@@ -5,7 +5,7 @@ manipulate files in Slack
 
 * List
 * Delete
-* Uniq (delete duplicated files)
+* Uniq (delete duplicate files)
 * Upload
 
 # Usage
@@ -17,7 +17,7 @@ Sub commands:
   auth                     authenticate
   delete, remove, del, rm  delete files
   list, ls                 list files
-  uniq                     delete duplicated files
+  uniq                     delete duplicate files
 
 Options:
   --config   (default: ./slack-file.conf)
@@ -94,8 +94,10 @@ Global Options:
 
 Usage:
   1. go to https://api.slack.com/apps
-  2. make a new app (files:read, files:write)
-  3. slack-file slack auth CLIENT_ID CLIENT_SECRET
+  2. make a new app
+        Redirect URLs: https://localhost:7878
+        Scopes: files:read, files:write
+  3. slack-file-uniq slack auth CLIENT_ID CLIENT_SECRET
 ```
 
 ## List
@@ -153,7 +155,7 @@ Usage:
 ## Uniq
 
 ```
-command uniq - delete duplicated files
+command uniq - delete duplicate files
 
 Options:
   --key      a unique key set of files (default: Name,Title)
@@ -165,7 +167,7 @@ Global Options:
   --config   (default: ./slack-file.conf)
 
 Usage:
-  # SIMULATE delete duplicated files by Name, keep newest Timestamp
+  # SIMULATE delete duplicate files by Name, keep newest Timestamp
   slack-file uniq --key Name --sort -Timestamp --dry-run
   # DELETE
   slack-file uniq --key Name --sort -Timestamp

@@ -23,7 +23,7 @@ func fileString(f slack.File) string {
 }
 
 type uniqCmd struct {
-	_ struct{} `help:"delete duplicated files" usage:"# SIMULATE delete duplicated files by Name, keep newest Timestamp\nslack-file uniq --key Name --sort -Timestamp --dry-run\n# DELETE\nslack-file uniq --key Name --sort -Timestamp"`
+	_ struct{} `help:"delete duplicate files" usage:"# SIMULATE delete duplicate files by Name, keep newest Timestamp\nslack-file uniq --key Name --sort -Timestamp --dry-run\n# DELETE\nslack-file uniq --key Name --sort -Timestamp"`
 
 	Key  gli.StrList `default:"Name,Title" help:"a unique key set of files"`
 	Sort gli.StrList `default:"-Created,-Timestamp,ID" help:"sort fields of each --key group"`

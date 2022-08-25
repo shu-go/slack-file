@@ -23,7 +23,7 @@ func init() {
 }
 
 type authCmd struct {
-	_ struct{} `help:"authenticate"   usage:"1. go to https://api.slack.com/apps\n2. make a new app (files:read, files:write)\n3. slack-file-uniq slack auth CLIENT_ID CLIENT_SECRET"`
+	_ struct{} `help:"authenticate"   usage:"1. go to https://api.slack.com/apps\n2. make a new app\n\tRedirect URLs: https://localhost:7878\n\tScopes: files:read, files:write\n3. slack-file-uniq slack auth CLIENT_ID CLIENT_SECRET"`
 
 	Port    int `cli:"port=PORT" default:"7878" help:"a temporal PORT for OAuth authentication."`
 	Timeout int `cli:"timeout=TIMEOUT" default:"60" help:"set TIMEOUT (in seconds) on authentication transaction. < 0 is infinite."`
