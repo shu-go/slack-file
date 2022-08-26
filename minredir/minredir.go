@@ -11,7 +11,7 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"math/big"
 	"net"
@@ -114,7 +114,7 @@ func LaunchMinServerTLS(port int, extractor func(r *http.Request, resultChan cha
 	defer ln.Close()
 
 	// OMAJINAI: call srv.setupHTTP2_ServeTLS()
-	log.SetOutput(ioutil.Discard)
+	log.SetOutput(io.Discard)
 	server.ServeTLS(nil, "", "")
 	defer log.SetOutput(os.Stderr)
 

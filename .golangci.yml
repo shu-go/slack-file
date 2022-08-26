@@ -1,0 +1,12 @@
+linters:
+  enable:
+    - gci
+    - revive
+    - exportloopref
+    - errorlint
+    - dupl
+    - dupl
+    - misspell
+    - tagliatelle
+    - unparam
+    - wastedassign

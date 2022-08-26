@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -133,7 +134,7 @@ func slackFetchAccessToken(clientID, clientSecret, authCode, redirectURI string)
 	dec := json.NewDecoder(resp.Body)
 	t := slackOAuth2AuthedTokens{}
 	err = dec.Decode(&t)
-	if err == io.EOF {
+	if errors.Is(err, io.EOF) {
 		return "", fmt.Errorf("auth response from the server is empty")
 	} else if err != nil {
 		return "", err

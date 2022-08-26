@@ -56,10 +56,7 @@ func testProp(f slack.File, prop string) bool {
 }
 
 func fileProp(f slack.File, prop string) string {
-	p := strings.ToLower(prop)
-	if strings.HasPrefix(p, "-") {
-		p = p[1:]
-	}
+	p := strings.TrimPrefix(strings.ToLower(prop), "-")
 
 	switch p {
 	case "id":
@@ -135,7 +132,6 @@ func fileProp(f slack.File, prop string) string {
 	default:
 		return ""
 	}
-	return ""
 }
 
 func bool2NumStr(b bool) string {

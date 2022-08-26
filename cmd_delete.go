@@ -48,7 +48,7 @@ func (c *deleteCmd) Before(global globalCmd) error {
 		}
 
 		for _, ch := range chans {
-			if strings.ToLower(c.Chan) == strings.ToLower(ch.Name) {
+			if strings.EqualFold(c.Chan, ch.Name) {
 				c.innerChan = ch.ID
 			}
 		}
