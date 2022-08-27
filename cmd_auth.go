@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,7 +12,7 @@ import (
 	"time"
 
 	"github.com/pkg/browser"
-	"github.com/shu-go/slack-file/minredir"
+	"github.com/shu-go/minredir"
 )
 
 var (
@@ -71,11 +72,19 @@ func (c authCmd) Run(global globalCmd, args []string) error {
 	}
 
 	resultChan := make(chan string)
-	go minredir.LaunchMinServerTLS(c.Port, minredir.CodeOAuth2Extractor, resultChan)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(c.Timeout)*time.Second)
+	err, errChan := minredir.ServeTLS(ctx, fmt.Sprintf(":%v", c.Port), resultChan)
 
 	authCode := waitForStringChan(resultChan, time.Duration(c.Timeout)*time.Second)
+	cancel()
+
 	if authCode == "" {
-		return fmt.Errorf("failed or timed out fetching an authentication code")
+		select {
+		case err = <-errChan:
+		default:
+			err = nil
+		}
+		return fmt.Errorf("failed or timed out fetching an authentication code: %w", err)
 	}
 
 	//

@@ -7,6 +7,7 @@ require (
 	github.com/gobwas/glob v0.2.3
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/shu-go/gli v1.5.2
+	github.com/shu-go/minredir v0.0.0-20220827031800-425d9f0c076a
 	github.com/slack-go/slack v0.10.2
 )
 
